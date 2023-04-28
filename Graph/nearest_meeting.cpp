@@ -53,3 +53,73 @@ int main() {
     cout << "-1" << endl;
     return 0;
 }
+
+
+//////////////////////////
+#include<bits/stdc++.h>
+using namespace std;
+
+typedef pair<int, int> pii;
+typedef vector<int> vi;
+typedef vector<pii> vpii;
+const int inf = 1e9;
+
+void Dijkstra(int s, vector<vpii> &adj, vi &d) {
+    int n = adj.size();
+    priority_queue<pii, vector<pii>, greater<pii>> pq;
+    d.assign(n, inf);
+    d[s] = 0;
+    pq.push({0, s});
+    while (!pq.empty()) {
+        int u = pq.top().second;
+        int d_u = pq.top().first;
+        pq.pop();
+        if (d_u != d[u]) continue;
+        for (auto &v : adj[u]) {
+            int to = v.first;
+            int len = v.second;
+            if (d[to] > d[u] + len) {
+                d[to] = d[u] + len;
+                pq.push({d[to], to});
+            }
+        }
+    }
+}
+
+int minimumWeight(int n, vector<int> &edges, int C1, int C2) {
+    // Create directed graph from the array given in input
+    vector<vpii> graph(n);
+    for (int i = 0; i < n; i++) {
+        if (edges[i] == -1) continue;
+        graph[i].push_back({edges[i], 1});
+    }
+    // Create two arrays A and B for storing min distance from C1 and C2
+    vi A(n), B(n);
+    // Part 1 and Part 2 of Algo -> Implement a dijkstra function and call it for both arrays A and B
+    Dijkstra(C1, graph, A);
+    Dijkstra(C2, graph, B);
+    // Now comes Part 3 part of algo -> loop through and get node with min(A[i]+B[i])
+    int node = -1, dist = inf;
+    for (int i = 0; i < n; i++) {
+        // if node is not accessible from any of them ignore it
+        if (A[i] == inf || B[i] == inf) continue;
+        if (dist > A[i] + B[i]) {
+            dist = A[i] + B[i];
+            node = i;
+        }
+    }
+    return node;
+}
+
+int main() {
+    int n;
+    cin >> n;
+    vector<int> edges(n);
+    for (int i = 0; i < n; i++) cin >> edges[i];
+    int C1, C2;
+    cin >> C1 >> C2;
+    int ans = minimumWeight(n, edges, C1, C2);
+    cout << ans << endl;
+    return 0;
+}
+
